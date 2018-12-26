@@ -8,6 +8,7 @@ from matplotlib import pyplot as plt
 
 # klasa pobierająca nazy i sortujaca je
 class getFileNames:
+    # funkcja sortujaca  (Proponowane rozwiązanie podpunkt 1.)
     def sortNames(self):
         # pobranie nazwy plików do listy
         self.fNames = os.listdir("./images")
@@ -15,7 +16,6 @@ class getFileNames:
         dictFloatName = {}
         unsortable = []
         sortNames = []
-
         # posortowanie od najmniejszej do najwiekszej
         # wartosci chropowatosci
         # WAŻNE ŻEBY PLIK BYŁ W FORMACIE XXX_Rough_X.XXXXXnm.png
@@ -126,7 +126,7 @@ class imageAnalysis:
         # wyznaczenie sumy kolejnych wartości histogramu unormowanego
         # sprawdzenie czy wartość histogramu nie jest równa 0
         for i in range(0, 256):
-            if val_hist[i] is not 0:
+            if val_hist[i] > 0:
                 temp_entropy += val_hist[i]*log2(val_hist[i])
             # jeśli jest to ominięcie
             else:
@@ -136,4 +136,71 @@ class imageAnalysis:
 
 
 def main():
-    pass
+    gfn = getFileNames()
+    gfn.sortNames()
+    # Wyciągnięcie chropowatości i posegregowanych nazw
+    rough = gfn.sortedFl
+    fileNames = gfn.sortedNames
+
+    # Lista wszystkich macierzy obrazow
+    imgMatrix = []
+    ima = imageAnalysis()
+    for i in fileNames:
+        ima.getImages(i)
+        imgMatrix.append(ima.img)
+
+    # lista sumy elementow
+    sumNM = []
+    # lista z iloczynami N*M
+    prodNM = []
+    for i in imgMatrix:
+        ima.matrixSum(i)
+        sumNM.append(ima.NM_sum)
+        prodNM.append(ima.productNM)
+
+    # Lista wynikowa [[sredniaJasnosc_1, odchylenieStd_1, entropia_1],
+    # [sredniaJasnosc_2, odchylenieStd_2, entropia_2],
+    # ...,
+    # [Lista slowników histogramow] ]
+    vecsResult = []
+    for i in range(0, len(sumNM)):
+        ima.matrixAvg(prodNM[i], sumNM[i])
+        temp = [ima.avg]
+        vecsResult.append(temp)
+
+    # lista z wynikami wariancji
+    varian = []
+    for i in range(0, len(imgMatrix)):
+        ima.matrixVariance(imgMatrix[i], vecsResult[i])
+        varian.append(ima.variance)
+
+    # umieszczenie odchylenia standardowego w liscie wynikow
+    for i in range(0, len(varian)):
+        ima.matrixStd(varian[i])
+        vecsResult[i].append(ima.std[0])
+
+    histograms = []
+    # okreslenie histogramow i umieszczenie ich w liscie wynikowej
+    for i in imgMatrix:
+        ima.matrixHistogram(i)
+        histograms.append(ima.histogram)
+    vecsResult.append(histograms)
+
+    # stworzenie list wartosci histogramow unormowanych
+    histNVal = []
+    for i in range(0, len(histograms)):
+        hist_temp = []
+        for j in range(0, 256):
+            hist_temp.append((histograms[i][j]/prodNM[i]))
+        histNVal.append(hist_temp)
+
+    # umieszczenie entropii w liscie wynikow
+    for i in range(0, len(histNVal)):
+        ima.imgEntropy(histNVal[i])
+        vecsResult[i].append(ima.entropy)
+
+    f = open('vecsResult.txt', 'w')
+    f.write(str(vecsResult))
+    f.close()
+
+    return vecsResult

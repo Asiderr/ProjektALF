@@ -13,7 +13,6 @@ class testGetFileNames(unittest.TestCase):
     def test_sortName(self):
         c = getFileNames()
         c.sortNames()
-        print(c.sortedNames)
         self.assertFalse(len(c.sortedFl) is 0, msg="Blad - pusta lista")
         for i in range(0, len(c.sortedFl)):
             if i is (len(c.sortedFl) - 1):
@@ -90,6 +89,13 @@ class testImageAnalysis(unittest.TestCase):
         val_hist[0] = 1
         c.imgEntropy(val_hist)
         self.assertEqual(c.entropy, 0, msg="Blad wyznaczania entropii dla zer")
+
+
+class testMain(unittest.TestCase):
+    def test_main(self):
+        test = main()
+        self.assertIn([163.19363418367345, 45.64993571527012, 7.205314713880184],
+                      test, msg="Blad listy wynikowej")
 
 
 if __name__ == '__main__':
