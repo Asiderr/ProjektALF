@@ -91,6 +91,26 @@ class testImageAnalysis(unittest.TestCase):
         self.assertEqual(c.entropy, 0, msg="Blad wyznaczania entropii dla zer")
 
 
+class test_plots(unittest.TestCase):
+    def test_figure1(self):
+        pl = plots()
+        nhist = []
+        cnhist = []
+        for i in range(0, 256):
+            nhist.append(1/256)
+        for i in range(0, 6):
+            cnhist.append(nhist)
+        pl.figure1(cnhist, 6)
+
+    def test_figure2(self):
+        pl = plots()
+        avg = [2, 2, 2, 2, 2, 2]
+        std = [0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+        ent = [6, 6, 6, 6, 6, 6]
+        rough = [0, 4, 10, 12, 15, 18]
+        pl.figure2(avg, std, ent, rough)
+
+
 class testMain(unittest.TestCase):
     def test_main(self):
         test = main()

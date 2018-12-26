@@ -135,6 +135,67 @@ class imageAnalysis:
         self.entropy = -temp_entropy
 
 
+class plots:
+    def figure1(self, nhist, num):
+        # okreslenie osi natezenia jasnosci pikseli
+        p = np.arange(0, 256)
+        # zainicjowanie wykresu
+        fig = plt.figure()
+        # sklejenie wykresow
+        fig.subplots_adjust(hspace=0.000)
+        # stworzenie odpowiedniej liczby wykresow do ilosci plikow w folderze
+        for i, v in enumerate(range(0, num)):
+            v += 1
+            # okreslenie miejsca wyswietlania ax
+            ax1 = plt.subplot(num, 1, v)
+            # okreslenie danych wyswietlanych
+            ax1.bar(p, nhist[i], color='r')
+            # wstawienie podtytulow osi
+            if i is int(num/2):
+                ax1.set_xlabel('Pixel propability [-]')
+                ax1.set_ylabel('Pixel intensity [-]')
+            # wstawienie jednej podzialki osi o wartosci polowy max value
+            y = [(max(nhist[i])/2)]
+            ax1.set_yticks(y)
+        plt.show()
+
+    def figure2(self, avg, std, ent, rough):
+        # sprawdzenie czy w folderze images zanjdują sie pliki bez wartosci chropowatosci
+        # jesli tak to usuniecie ich z listy
+        if len(rough) is not len(avg):
+            pop_n = len(avg)-len(rough)
+            for i in range(0, pop_n):
+                avg.pop()
+                std.pop()
+                ent.pop()
+        # zainicjowanie wykresow
+        fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True)
+        # sklejenie wykresow
+        fig.subplots_adjust(hspace=0.000)
+        # zainicjowanie sredniej jasnosci
+        ax1.plot(rough, avg, marker='o', linestyle=':', label='Brightness')
+        # stworzenie zakresu zacieniowanego obszaru
+        std_l = []
+        std_h = []
+        for i in range(0, len(avg)):
+            std_l.append(avg[i]-std[i])
+            std_h.append(avg[i]+std[i])
+        # zainicjowanie zacieniowanego obszaru
+        ax1.fill_between(rough, std_l, std_h, alpha=0.4, label=r"Standard deviation $\sigma$")
+        # zainicjowanie entropii
+        ax2.plot(rough, ent, marker='o', linestyle=':', label='Entropy', color='r')
+        # stworzenie opisow osi
+        ax1.legend()
+        ax2.legend()
+        # wlaczenie siatki wykresu
+        ax1.grid()
+        ax2.grid()
+        # ustalenie zakresu osi y w pierwszym wykresie
+        ax1.set_yticks(range(0, 256, 50))
+        ax1.set_yticks(range(0, 256, 5), minor=True)
+        plt.show()
+
+
 def main():
     gfn = getFileNames()
     gfn.sortNames()
@@ -163,9 +224,12 @@ def main():
     # ...,
     # [Lista slowników histogramow] ]
     vecsResult = []
+    # lista srednich jasnosci do stworzenia wykresu
+    avgfig = []
     for i in range(0, len(sumNM)):
         ima.matrixAvg(prodNM[i], sumNM[i])
         temp = [ima.avg]
+        avgfig.append(ima.avg)
         vecsResult.append(temp)
 
     # lista z wynikami wariancji
@@ -174,10 +238,12 @@ def main():
         ima.matrixVariance(imgMatrix[i], vecsResult[i])
         varian.append(ima.variance)
 
+    stdfig = []
     # umieszczenie odchylenia standardowego w liscie wynikow
     for i in range(0, len(varian)):
         ima.matrixStd(varian[i])
         vecsResult[i].append(ima.std[0])
+        stdfig.append(ima.std[0])
 
     histograms = []
     # okreslenie histogramow i umieszczenie ich w liscie wynikowej
@@ -194,13 +260,22 @@ def main():
             hist_temp.append((histograms[i][j]/prodNM[i]))
         histNVal.append(hist_temp)
 
+    entfig = []
     # umieszczenie entropii w liscie wynikow
     for i in range(0, len(histNVal)):
         ima.imgEntropy(histNVal[i])
         vecsResult[i].append(ima.entropy)
+        entfig.append(ima.entropy)
 
+    # Zapisanie wyników do pliku
     f = open('vecsResult.txt', 'w')
     f.write(str(vecsResult))
     f.close()
 
+    # Uruchomienie rysunków
+    pl = plots()
+    pl.figure1(histNVal, len(histNVal))
+    pl.figure2(avgfig, stdfig, entfig, rough)
     return vecsResult
+
+main()
