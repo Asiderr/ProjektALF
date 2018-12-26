@@ -81,3 +81,18 @@ class imageAnalysis:
                 temp_hist[matrix[i][j]] += 1
 
         self.histogram = dict(temp_hist)
+
+    # wyliczenie entropii (Proponowane rozwiązanie podpunkt 7.)
+    # funkcja przyjmuje liste wartości histogramu unormowanego
+    def imgEntropy(self, val_hist):
+        temp_entropy = 0
+        # wyznaczenie sumy kolejnych wartości histogramu unormowanego
+        # sprawdzenie czy wartość histogramu nie jest równa 0
+        for i in range(0, 256):
+            if val_hist[i] is not 0:
+                temp_entropy += val_hist[i]*log2(val_hist[i])
+            # jeśli jest to ominięcie
+            else:
+                pass
+
+        self.entropy = -temp_entropy

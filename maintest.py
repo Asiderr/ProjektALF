@@ -71,9 +71,23 @@ class testImageAnalysis(unittest.TestCase):
         c.matrixHistogram(matrix)
         self.assertEqual(c.histogram[0], 12, msg="Blad wyznaczania histogramu")
 
-    def test_imgEntropy(self):
+    def test_imgEntropy_not_zero(self):
         c = imageAnalysis()
-        
+        val_hist = []
+        for i in range(0, 256):
+            val_hist.append(1/256)
+        c.imgEntropy(val_hist)
+        self.assertEqual(c.entropy, 8, msg="Blad wyznaczania entropii dla wartości")
+
+    def test_imgEntropy_zero(self):
+        c = imageAnalysis()
+        val_hist = []
+        for i in range(0, 256):
+            val_hist.append(0)
+        val_hist[0] = 1
+        c.imgEntropy(val_hist)
+        self.assertEqual(c.entropy, 0, msg="Blad wyznaczania entropii dla zer")
+
 
 if __name__ == '__main__':
     unittest.main()
