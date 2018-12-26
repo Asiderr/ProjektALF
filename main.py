@@ -3,6 +3,7 @@
 import os
 import cv2
 import numpy as np
+from math import log2
 from matplotlib import pyplot as plt
 
 
@@ -25,6 +26,9 @@ class imageAnalysis:
         # wyznaczenie wielkosci macierzy
         N_size = len(matrix)
         M_size = len(matrix[0])
+
+        # iloczyn N i M potrzebny do sredniej
+        self.productNM = N_size * M_size
         temp_sum = 0
 
         # sumowanie wszystkich wartosci w macierzy
@@ -34,3 +38,46 @@ class imageAnalysis:
 
         # przypisanie sumy tymczasowej do zmiennej klasowej
         self.NM_sum = temp_sum
+
+    # Wyznaczenie sredniej (Proponowane rozwiązanie podpunkt 3.)
+    # (iloczyn NM wykorzystany z funkcji matrixSum)
+    def matrixAvg(self, prodNM, sumNM):
+        self.avg = (1/prodNM)*sumNM
+
+    # Wyliczanie wariancji (Proponowane rozwiązanie podpunkt 4.)
+    def matrixVariance(self, matrix, mAvg):
+        # wyznaczenie wielkosci macierzy
+        N_size = len(matrix)
+        M_size = len(matrix[0])
+        prod_NM = N_size * M_size
+        temp_sum = 0
+
+        # wyliczenie sumy kwadratow
+        for i in range(0, N_size):
+            for j in range(0, M_size):
+                temp_sum += pow((matrix[i][j] - mAvg), 2)
+
+        # wyliczenie wariancji
+        self.variance = (1/prod_NM)*temp_sum
+
+    # wyliczanie odchylenia standardowego (Proponowane rozwiązanie podpunkt 5.)
+    def matrixStd(self, variance):
+        self.variance = pow(variance, 0.5)
+
+    # wyznaczenie histogramu (Proponowane rozwiązanie podpunkt 6.)
+    def matrixHistogram(self, matrix):
+        # tworzenia slownika kluczy od 0 do 255
+        temp_hist = {}
+        for i in range(0, 256):
+            temp_hist[i] = 0
+
+        # wyznaczenie wielkosci macierzy
+        N_size = len(matrix)
+        M_size = len(matrix[0])
+
+        # wyznaczenie histogramu
+        for i in range(0, N_size):
+            for j in range(0, M_size):
+                temp_hist[matrix[i][j]] += 1
+
+        self.histogram = dict(temp_hist)
