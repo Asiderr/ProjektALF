@@ -9,14 +9,17 @@ class testGetFileNames(unittest.TestCase):
         c = getFileNames()
         c.sortNames()
         self.assertIn('testimg.jpg', c.fNames, msg="Blad pobierania nazw plikow")
-"""
- Dopisać test do sortowania
-    def test_ifSorted(self):
-        c.getFileNames()
+
+    def test_sortName(self):
+        c = getFileNames()
         c.sortNames()
-        for name in c.fNames:
-            self.assertTrue()
-"""
+        print(c.sortedNames)
+        self.assertFalse(len(c.sortedFl) is 0, msg="Blad - pusta lista")
+        for i in range(0, len(c.sortedFl)):
+            if i is (len(c.sortedFl) - 1):
+                pass
+            else:
+                self.assertTrue(c.sortedFl[i] <= c.sortedFl[i+1], msg="Blad sortowania nazw")
 
 
 class testImageAnalysis(unittest.TestCase):
@@ -59,7 +62,7 @@ class testImageAnalysis(unittest.TestCase):
     def test_matrixStd(self):
         c = imageAnalysis()
         c.matrixStd(4)
-        self.assertEqual(c.variance, 2, msg="Blad wyliczania odchylenia standardowego")
+        self.assertEqual(c.std, 2, msg="Blad wyliczania odchylenia standardowego")
 
     def test_matrixHistogram(self):
         c = imageAnalysis()

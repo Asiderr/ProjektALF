@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 import os
 import cv2
 import numpy as np
@@ -10,10 +9,48 @@ from matplotlib import pyplot as plt
 # klasa pobierająca nazy i sortujaca je
 class getFileNames:
     def sortNames(self):
+        # pobranie nazwy plików do listy
         self.fNames = os.listdir("./images")
-"""
-Dopisać funkcję sortującą
-"""
+        tempFloatList = []
+        dictFloatName = {}
+        unsortable = []
+        sortNames = []
+
+        # posortowanie od najmniejszej do najwiekszej
+        # wartosci chropowatosci
+        # WAŻNE ŻEBY PLIK BYŁ W FORMACIE XXX_Rough_X.XXXXXnm.png
+        for i in self.fNames:
+            # Wyodrebnienie wartosci chropowatosci z nazwy pliku
+            tempName = i.split("_Rough_")
+            if tempName[0] is i:
+                unsortable.append(i)
+            else:
+                tempName = tempName[1].split("nm.png")
+                tempFloatList.append(float(tempName[0]))
+                # Stworzenie słownika klucz chropowatość : nazwa pliku
+                dictFloatName[float(tempName[0])] = i
+
+        # sortowanie babelkowe
+        for j in range(0, len(tempFloatList)):
+            for i in range(0, len(tempFloatList)):
+                if i is (len(tempFloatList)-1):
+                    break
+                if tempFloatList[i] > tempFloatList[i+1]:
+                    temp = tempFloatList[i]
+                    tempFloatList[i] = tempFloatList[i+1]
+                    tempFloatList[i+1] = temp
+
+        # lista posortowanych chropowatosci
+        self.sortedFl = tempFloatList.copy()
+
+        # stworzenie listy posortowanych nazw
+        for i in tempFloatList:
+            sortNames.append(dictFloatName[i])
+
+        for i in unsortable:
+            sortNames.append(i)
+
+        self.sortedNames = sortNames.copy()
 
 
 class imageAnalysis:
@@ -62,7 +99,7 @@ class imageAnalysis:
 
     # wyliczanie odchylenia standardowego (Proponowane rozwiązanie podpunkt 5.)
     def matrixStd(self, variance):
-        self.variance = pow(variance, 0.5)
+        self.std = pow(variance, 0.5)
 
     # wyznaczenie histogramu (Proponowane rozwiązanie podpunkt 6.)
     def matrixHistogram(self, matrix):
@@ -96,3 +133,7 @@ class imageAnalysis:
                 pass
 
         self.entropy = -temp_entropy
+
+
+def main():
+    pass
